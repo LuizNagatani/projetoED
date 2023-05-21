@@ -2,192 +2,216 @@
 #include <stdlib.h>
 #include <string.h>
 
-//#include "headers/heap/FD.h"
-//#include "headers/stack/PD.h"
-
-#define MAX  100
-
-typedef struct Node{
-
-    int *info;
-   struct  Node *next;
-
-}node;
-
-
-
-typedef struct{
-struct Node *ini;
-struct Node *fim;
-
-}fila;
-
-typedef struct Anime{
-int eps;
-int baixados;
-int assistidos;
-char nome [MAX];
-fila *queue
-}anime;
+typedef struct Nodo {
+    char nome[50];
+    int episode_num;
+    int duracao;
+    struct Nodo *prox;
+} Nodo;
 
 typedef struct {
-struct Node *topo;
-struct Anime *a;
-}pilha;
-fila*criafila(){
-  fila*f = (fila*)malloc(sizeof(fila));
-  f->ini = NULL;
-  f->fim = NULL;
-  return f;
-}
-pilha*comeca(pilha *p, char E, int A){
-    printf("comeca serie %c com %d episodios", E, A);
-    
-    node*novo = (node*)malloc(sizeof(node));
-    novo->info = E;
-    novo->next = p->topo;
-    p->topo = novo;
-    return p;
-}
-pilha*push(pilha*p, anime *a, int A){//pilha ligada
+    Nodo *topo;
+} pilha;
 
-    node*novo = (node*)malloc(sizeof(node));
-    novo->info = a;
-    novo->next = p->topo;
-    p->topo = novo;
-    a->eps=A;
-   
-   
+void push(pilha *s, char *nome) {
+    Nodo *novo = (Nodo *)malloc(sizeof(Nodo));
+    strcpy(novo->nome, nome);
+    novo->prox = s->topo;
+    s->topo = novo;
 }
-int pop(pilha *p) {
-  node *pt = p->topo;
-  if(p->topo == NULL) return;
-node *aux = pt->next; 
-  int valor= pt->info;
-free(p->topo);
-p->topo = aux;
-  return valor;
-
-}
-fila* pushfila(fila *f, int x){
-  node*novo = (node*)malloc(sizeof(node));
-  novo->info = x;
-  if(f->fim == NULL){
-  f->ini= novo;
-    f->fim =novo;
-  }
+void pop(pilha *p) {
   
-  else{
-    f->fim->next = novo;
-    f->fim = novo;
-  } 
-novo ->next = NULL;
-
+  if(p->topo >= 0) p->topo--;
 }
-int pilhaVazia(pilha *p) {
-    return (p->topo == NULL); // Retorna verdadeiro se o topo da pilha for nulo
-}
-int filaVazia(fila *p) {
-    return (p->ini == NULL); // Retorna verdadeiro se o topo da pilha for nulo
-}
-void popfila(fila*f){
-  if (f->ini != NULL) {
-    node *temp = f->ini;
-    f->ini = f->ini->next;
-    
-    free(temp);
-  } else {
-    printf("Fila vazia\n");
-  }
-}
-char compareStrings(pilha *list, char *S, char *E){
-    char S_compare_start[]="comeca", S_compare_download[]="download", S_compare_assiste[]="assiste";
+typedef struct {
+    Nodo *ini;
+    Nodo *fim;
+    int maximo;
+    int baixados;
+} Fila;
 
-    int A, t;
-    if(strcmp(S, S_compare_start) == 0){
-        scanf("%s %d", E, &A);
-      anime*a=(anime*)malloc(sizeof(anime));
-       
-      list->a = a;
-        fila*f = criafila();
-      list->a->queue = f;
-      push(list, a, A);
-      list->a->baixados = 0;//teste
-      printf("comecando %s com %d episodios\n", E, A);
-        
-        //função funcionando perfeitamente;
+typedef struct {
+    Fila animes[10];
+    int num_animes;
+} Anime;
 
-
-    }else
-    if(strcmp(S, S_compare_download) == 0){
-        scanf("%d %d", &A, &t);
-      int i = 0;
-    if(list->a->eps > list->a->baixados){
-      for (i=0; i<=A-1; i++){
-        if(list->a->eps <= list->a->baixados) break;
-           pushfila(list->a->queue, list->a->baixados+1);
-          
-        list->a->baixados++;
-      }
-      printf("%d episodios de %s baixados\n", A, E);
-    }
-      
-      
-      
-     if(list->a->eps <= list->a->baixados){
-        printf("não há episódios para baixar");
-      }
-       printf("Fila:%d ",filaVazia(list->a->queue) );
-  node *temp = list->a->queue->ini;
-  while (temp != NULL) {
-    printf("%d ", temp->info);
-    temp = temp->next;
-  }
-  printf("\n");
-    }
- if(strcmp(S, S_compare_assiste) == 0){
-    scanf("%d", &A);
-    
-    
-    int i = 0;
-   if(filaVazia(list->a->queue) == 0){
-    for (i=0; i==A; i++){
-  
-        popfila(list->a->queue);
-    printf("Assistido %d episodios de %s, (%d minutos)\n", A, E, A*t);
-      
-    }
-      if(filaVazia(list->a->queue) == 1){
-        pop(list);
-        printf("acabou %s\n",E);
-      }
-    }
-    return S;
-}
-
-}
-
-int main(){
-	/*
-	 * S --> instruction "start"
-	 * E --> name of the show
-	 * A --> nº of episodes
-	 * */
-    
-
-
-	char S[6], E[MAX],  S_compare_exit[] = "f";
-    pilha*p = (pilha*)malloc(sizeof(pilha));
-    p->topo = NULL;
-	while(1){
-        scanf("%s", S);
-        if(strcmp(S, S_compare_exit) == 0){
-            return 0;
+Fila *get_queue(Anime *q, char *nome) {
+    for (int i = 0; i < q->num_animes; i++) {
+        if (strcmp(q->animes[i].ini->nome, nome) == 0) {
+            return &q->animes[i];
         }
-        compareStrings(p ,S, E);
     }
-
-
-	return 0;
+    
+    q->num_animes++;
+    q->animes[q->num_animes - 1].ini = NULL;
+    q->animes[q->num_animes - 1].fim = NULL;
+    return &q->animes[q->num_animes - 1];
 }
+
+int enqueue(Fila *queue, pilha *s, int num_episodios, int duracao) {
+    int count = 0, i;
+    Nodo *temp = queue->ini;
+    while (temp != NULL) {
+        count++;
+        temp = temp->prox;
+    }
+   
+    for (i = 0; i <= num_episodios-1; i++) {
+        if(queue->baixados== queue->maximo) break;
+        Nodo *novo = (Nodo *)malloc(sizeof(Nodo));
+        strcpy(novo->nome, s->topo->nome);
+        novo->episode_num = i;
+        novo->duracao = duracao;
+        novo->prox = NULL;
+        queue->baixados++;
+
+        if (queue->fim == NULL) {
+            queue->ini = novo;
+            queue->fim = novo;
+        } else {
+            queue->fim->prox = novo;
+            queue->fim = novo;
+        }
+    }
+  return i;
+}
+
+Nodo dequeue(Fila *f) {
+    Nodo temp = *(f->ini);
+    Nodo *temp_ptr = f->ini;
+    f->ini = f->ini->prox;
+    if (f->ini == NULL) {
+        f->fim = NULL;
+    }
+    free(temp_ptr);
+    return temp;
+}
+
+void print_queue(Fila *queue) {
+    if (queue->ini == NULL) {
+        printf("Fila vazia\n");
+        return;
+    }
+    Nodo *temp = queue->ini;
+    while (temp != NULL) {
+        printf("%s %d ", temp->nome, temp->episode_num);
+        temp = temp->prox;
+    }
+    printf("\n");
+}
+
+void print_remaining(Anime *q) {
+    int restante = 0;
+    for (int i = 0; i < q->num_animes; i++) {
+        Fila *queue = &q->animes[i];
+        if (queue->ini != NULL) {
+            restante++;
+            int count = 0;
+            Nodo *temp = queue->ini;
+            while (temp != NULL) {
+                count++;
+                temp = temp->prox;
+            }
+            printf("ha %d episodios sobrando de %s de %d\n", queue->maximo, queue->ini->nome, count);
+        }
+    }
+    if (restante == 0) {
+        printf("sem episodios para assistir\n");
+    }
+}
+
+int main() {
+    pilha s = {.topo = NULL};
+    Anime q = {.num_animes = 0};
+    char comando[10];
+    char nome[50];
+    int num_episodios, duracao;
+    int tempo_restante = 0;
+    Fila *atual = NULL;
+    int primeiro_comando = 1;
+    while (1) {
+
+        scanf("%s", comando);
+
+        if (strcmp(comando, "f") == 0) {
+            print_remaining(&q);
+            break;
+        } else if (strcmp(comando, "comeca") == 0) {
+            scanf("%s %d", nome, &num_episodios);
+            printf("comecando %s com %d episodios\n", nome, num_episodios);
+            push(&s, nome);
+            atual = get_queue(&q, nome);
+            atual->maximo = num_episodios;
+            primeiro_comando = 0;
+        } else if (strcmp(comando, "download") == 0) {
+            if (primeiro_comando) {
+                printf("nao ha episodios para baixar\n");
+                continue;
+            }
+            scanf("%d %d", &num_episodios, &duracao);
+           int i = enqueue(atual, &s, num_episodios, duracao);
+          if (i == 0){
+            printf("nao ha episodios para baixar", nome);
+          
+          }
+          else printf("%d episodios baixados de %s\n", i, nome);
+        } else if (strcmp(comando, "assiste") == 0) {
+          if(atual->ini>atual->fim && s.topo > 0){
+              printf("acabou %s", nome);
+           pop(&s);
+              }
+            if (primeiro_comando) {
+                printf("nao ha animes para assistir\n");
+                continue;
+            }
+            scanf("%d", &num_episodios);
+
+            if (atual->ini == NULL && s.topo != NULL) {
+                Nodo *temp_ptr = s.topo;
+                s.topo = s.topo->prox;
+                free(temp_ptr);
+                atual = get_queue(&q, s.topo->nome);
+                printf("nao ha mais episodios de %s para assistir\n", s.topo->prox->nome);
+                continue;
+            } else if (atual->ini == NULL && s.topo == NULL) {
+                printf("nao ha mais episodios de %s para assistir\n", s.topo->nome);
+                continue;
+            }
+
+            Nodo temp = *(atual->ini);
+            tempo_restante += (atual->fim - atual->ini + 1) * temp.duracao;
+            int count = 0;
+            Nodo *temp_ptr = atual->ini;
+            while (temp_ptr != NULL) {
+                count++;
+                temp_ptr = temp_ptr->prox;
+            }
+            if (num_episodios > count) {
+                printf("apenas %d restantes\n", count);
+                tempo_restante -= count * temp.duracao;
+                printf("%d episodios assistidos (%d minutoss)\n", count, count * temp.duracao);
+                while (atual->ini != NULL && strcmp(atual->ini->nome, s.topo->nome) == 0) {
+                    dequeue(atual);
+                }
+              
+                if (s.topo != NULL) {
+                    Nodo *temp_ptr = s.topo;
+                    s.topo = s.topo->prox;
+                    free(temp_ptr);
+                }
+                atual = get_queue(&q, s.topo->nome);
+            } else {
+                tempo_restante -= num_episodios * temp.duracao;
+                printf("%d episodios de %s assistidos (%d minutos)\n", num_episodios, s.topo->nome, num_episodios * temp.duracao);
+                for (int i = 0; i < num_episodios && atual->ini != NULL && strcmp(atual->ini->nome, s.topo->nome) == 0; i++) {
+                    dequeue(atual);
+                }
+            }
+        } else if (strcmp(comando, "print_queue") == 0) {
+            print_queue(atual);
+        }
+    }
+    return 0;
+}
+
 
